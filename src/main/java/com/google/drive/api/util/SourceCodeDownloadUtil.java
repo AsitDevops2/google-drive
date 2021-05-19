@@ -65,7 +65,7 @@ public class SourceCodeDownloadUtil {
             try {
               zippedOut.putNextEntry(ze);
             } catch (IOException e) {
-            	logger.error("Error while adding files in ZipEntry :", e);
+              logger.error("Error while adding files in ZipEntry :", e);
             }
             try (
               FileInputStream in = new FileInputStream(
@@ -77,14 +77,14 @@ public class SourceCodeDownloadUtil {
                 zippedOut.write(buffer, 0, len);
               }
             } catch (IOException e) {
-            	logger.error("Error while reading files in FileInputSTream :", e);
+              logger.error("Error while reading files in FileInputSTream :", e);
             }
           }
         );
 
       zippedOut.closeEntry();
     } catch (IOException ex) {
-    	logger.error("Error while opening zipoutputstream :", ex);
+      logger.error("Error while opening zipoutputstream :", ex);
     }
   }
 }
