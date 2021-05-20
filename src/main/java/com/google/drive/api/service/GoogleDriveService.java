@@ -1,24 +1,30 @@
 package com.google.drive.api.service;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.List;
+
+import javax.annotation.Nonnull;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import com.google.drive.api.util.SourceCodeDownloadUtil;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.List;
-import javax.annotation.Nonnull;
-import javax.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 @Service
 public class GoogleDriveService {
   @Autowired
   Drive googleDrive;
+  
 
   @Autowired
   SourceCodeDownloadUtil util;
+  
+  @Autowired String doGoogleSignIn;
 
   /**
    * Method to get list of files from google drive
@@ -64,4 +70,15 @@ public class GoogleDriveService {
   public void downloadSource(HttpServletResponse response) {
     util.downloadZip(response);
   }
+  
+  /**
+   * Method to return google sign in url
+ * @return
+ * @throws IOException
+ */
+public String redirectURL() 
+  {
+	 return  doGoogleSignIn;
+  }
+
 }
