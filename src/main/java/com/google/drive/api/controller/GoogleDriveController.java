@@ -1,6 +1,7 @@
 package com.google.drive.api.controller;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.drive.api.service.GoogleDriveService;
 
@@ -30,24 +30,23 @@ public class GoogleDriveController {
   @Autowired
   GoogleDriveService service;
   
-  @Autowired
-  Drive googleDrive;
+ 
   
 
   @GetMapping("/Files")
-  public ResponseEntity<List<File>> files() throws IOException {
+  public ResponseEntity<List<File>> files() throws IOException, GeneralSecurityException {
     List<File> files = service.files();
     return ResponseEntity.ok(files);
   }
 
   @GetMapping("/File/{id}")
-  public File retireveFileMetadata(@PathVariable String id) throws IOException {
+  public File retireveFileMetadata(@PathVariable String id) throws IOException, GeneralSecurityException {
     return service.getFile(id);
   }
   
   @GetMapping("/download/{id}")
   public void download(@PathVariable String id, HttpServletResponse response)
-    throws IOException {
+    throws IOException, GeneralSecurityException {
     service.downloadFile(id, response.getOutputStream());
   }
 
@@ -56,9 +55,10 @@ public class GoogleDriveController {
     service.downloadSource(response);
   }
 
-  @GetMapping("/signInUrl")
-  public String doGoogleSignIn()  {
-    return service.redirectURL();
+  @GetMapping("/connect")
+  public  ResponseEntity<String> connectDrive() throws GeneralSecurityException, IOException  {
+	  service.connectDrive();
+    return ResponseEntity.ok("succesfully connected");
   }
   
   @PostMapping(value = "/upload",consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}, produces = {MediaType.APPLICATION_JSON_VALUE} )

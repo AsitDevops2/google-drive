@@ -10,20 +10,19 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
-import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeRequestUrl;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
+import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 
 @Configuration
@@ -58,7 +57,7 @@ public class GoogleApiClientConfig {
    * @return {@link GoogleCredential}
    * @throws GeneralSecurityException
    */
-  @Bean
+  
   public Credential googleCredential() throws IOException, GeneralSecurityException {
     // Load client secrets.
     InputStream in = GoogleApiClientConfig.class.getResourceAsStream(credentialsPath);
@@ -87,19 +86,15 @@ public class GoogleApiClientConfig {
     return new AuthorizationCodeInstalledApp(flow, receiver).authorize(user);
   }
   
-  @Bean
-  public String doGoogleSignIn() throws IOException {
-		GoogleAuthorizationCodeRequestUrl url = flow.newAuthorizationUrl();
-		return  url.setRedirectUri(receiver.getRedirectUri()).build();
-		
-	}
+  
+ 
 
   /**
    * A preconfigured HTTP client for calling out to Google APIs.
    *
    * @return {@link NetHttpTransport}
    */
-  @Bean
+  
   public NetHttpTransport netHttpTransport()
     throws GeneralSecurityException, IOException {
     return GoogleNetHttpTransport.newTrustedTransport();
@@ -110,8 +105,11 @@ public class GoogleApiClientConfig {
    *
    * @return {@link JacksonFactory}
    */
-  @Bean
+  
   public JacksonFactory jacksonFactory() {
     return JacksonFactory.getDefaultInstance();
   }
+  public Drive googleDrive() throws GeneralSecurityException, IOException {
+	    return new Drive(netHttpTransport(), jacksonFactory(), googleCredential());
+	  }
 }

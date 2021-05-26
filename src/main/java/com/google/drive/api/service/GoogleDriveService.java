@@ -3,6 +3,7 @@ package com.google.drive.api.service;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.List;
 
@@ -16,15 +17,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.google.api.client.http.InputStreamContent;
-import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
+import com.google.drive.api.config.GoogleApiClientConfig;
 import com.google.drive.api.util.SourceCodeDownloadUtil;
 
 @Service
 public class GoogleDriveService {
-  @Autowired
-  Drive googleDrive;
+  @Autowired GoogleApiClientConfig config;
   
 
   Logger logger = LoggerFactory.getLogger(GoogleDriveService.class);
@@ -32,16 +32,21 @@ public class GoogleDriveService {
   @Autowired
   SourceCodeDownloadUtil util;
   
-  @Autowired String doGoogleSignIn;
+  
+  public void connectDrive() throws GeneralSecurityException, IOException
+  {
+	  config.googleDrive();
+  }
 
   /**
    * Method to get list of files from google drive
    * @return list of files
    * @throws IOException
+ * @throws GeneralSecurityException 
    */
-  public List<File> files() throws IOException {
+  public List<File> files() throws IOException, GeneralSecurityException {
     // Print the names and IDs for up to 10 files.
-    FileList result = googleDrive
+    FileList result = config.googleDrive()
       .files()
       .list()
       .setPageSize(10)
@@ -57,8 +62,8 @@ public class GoogleDriveService {
    * @throws IOException
    */
   public void downloadFile(@Nonnull String id, OutputStream outputStream)
-    throws IOException {
-    googleDrive.files().get(id).executeMediaAndDownloadTo(outputStream);
+    throws IOException,GeneralSecurityException {
+	  config.googleDrive().files().get(id).executeMediaAndDownloadTo(outputStream);
   }
 
   /**
@@ -67,8 +72,8 @@ public class GoogleDriveService {
    * @return
    * @throws IOException
    */
-  public File getFile(@Nonnull String id) throws IOException {
-    return googleDrive.files().get(id).execute();
+  public File getFile(@Nonnull String id) throws IOException,GeneralSecurityException {
+    return  config.googleDrive().files().get(id).execute();
   }
 
   /**
@@ -79,15 +84,7 @@ public class GoogleDriveService {
     util.downloadZip(response);
   }
   
-  /**
-   * Method to return google sign in url
- * @return
- * @throws IOException
- */
-	public String redirectURL() 
-	  {
-		 return  doGoogleSignIn;
-	  }
+
 	
 	/**
 	   * Method to upload file to google drive
@@ -101,7 +98,7 @@ public class GoogleDriveService {
 	        File fileMetadata = new File();
 	        fileMetadata.setParents(Collections.singletonList(folderId));
 	        fileMetadata.setName(file.getOriginalFilename());
-	        File uploadFile = googleDrive
+	        File uploadFile =  config.googleDrive()
 	              .files()
 	              .create(fileMetadata, new InputStreamContent(
 	                    file.getContentType(),
