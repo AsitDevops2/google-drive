@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 public class SourceCodeDownloadUtil {
   Logger logger = LoggerFactory.getLogger(SourceCodeDownloadUtil.class);
   private static final String SOURCE_FOLDER =
-    "C:\\Codebase\\Googledrive-api\\google-drive"; // SourceFolder path
+    "D:\\google-drive"; // SourceFolder path
   List<String> files = null;
 
   SourceCodeDownloadUtil() {

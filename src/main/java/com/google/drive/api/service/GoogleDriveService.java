@@ -1,15 +1,21 @@
 package com.google.drive.api.service;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.google.api.client.http.InputStreamContent;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
@@ -20,6 +26,8 @@ public class GoogleDriveService {
   @Autowired
   Drive googleDrive;
   
+
+  Logger logger = LoggerFactory.getLogger(GoogleDriveService.class);
 
   @Autowired
   SourceCodeDownloadUtil util;
@@ -76,9 +84,37 @@ public class GoogleDriveService {
  * @return
  * @throws IOException
  */
-public String redirectURL() 
-  {
-	 return  doGoogleSignIn;
-  }
+	public String redirectURL() 
+	  {
+		 return  doGoogleSignIn;
+	  }
+	
+	/**
+	   * Method to upload file to google drive
+	   * @return
+	   * @throws IOException
+	   */	
+	public String upload(MultipartFile file, String filePath) {
+	  try {
+	     String folderId = "1SDo8Tl_Wc0dw11XpUxfHnA9FrGWPd-mC";
+	     if (null != file) {
+	        File fileMetadata = new File();
+	        fileMetadata.setParents(Collections.singletonList(folderId));
+	        fileMetadata.setName(file.getOriginalFilename());
+	        File uploadFile = googleDrive
+	              .files()
+	              .create(fileMetadata, new InputStreamContent(
+	                    file.getContentType(),
+	                    new ByteArrayInputStream(file.getBytes()))
+	              )
+	              .setFields("id").execute();
+	        
+	        return uploadFile.getId();
+	     }
+	  } catch (Exception e) {
+	     logger.error("Error: ", e);
+	  }
+		  return null;
+		}
 
 }

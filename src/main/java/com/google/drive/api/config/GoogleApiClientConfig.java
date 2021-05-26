@@ -48,7 +48,7 @@ public class GoogleApiClientConfig {
    */
   private Set<String> googleOAuth2Scopes() {
     Set<String> googleOAuth2Scopes = new HashSet<>();
-    googleOAuth2Scopes.add(DriveScopes.DRIVE_READONLY);
+    googleOAuth2Scopes.add(DriveScopes.DRIVE);
     return Collections.unmodifiableSet(googleOAuth2Scopes);
   }
 
